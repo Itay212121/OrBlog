@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, shrink-to-fit=no"
+    />
+    <meta name="description" content="" />
+    <meta name="author" content="" />
+    <link rel="icon" href="/docs/4.0/assets/img/favicons/favicon.ico" />
+
+    <title>Album example for Bootstrap</title>
+
+    <link
+      rel="canonical"
+      href="https://getbootstrap.com/docs/4.0/examples/sign-in/"
+    />
+
+    <!-- Bootstrap core CSS -->
+    <link
+      href="https://getbootstrap.com/docs/4.0//dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <!-- Custom styles for this template -->
+
+    <!-- Custom styles for this template -->
+    <link href="edit-page.css" rel="stylesheet" />
+  </head>
+
+  <body>
+    <div
+      class="d-flex flex-column flex-md-row align-items-center p-3 px-md-4 mb-3 bg-white border-bottom box-shadow"
+    >
+      <h5 class="my-0 mr-md-auto font-weight-normal">Or Haifler Blog</h5>
+      <nav class="my-2 my-md-0 mr-md-3">
+        <a class="p-2 text-dark" href="/">Home Page</a>
+      </nav>
+    </div>
+
+    <main role="main">
+      <section class="jumbotron text-center">
+        <div class="container">
+          <h1 class="jumbotron-heading">Edit Blogs</h1>
+          <p class="lead text-muted">
+            Here you can edit exsiting blogs, or even hide them. Please choose
+            the blog you want to change from the list below:
+          </p>
+        </div>
+      </section>
+      <div class="container">
+        <div class="row">
+          <% blogs.forEach(function(blog){ %>
+
+          <div class="col-md-4">
+            <div class="card mb-4 box-shadow">
+              <div class="card-body">
+                <h4 class="card-text"><%=blog.title%></p>
+                <div class="d-flex justify-content-between align-items-center">
+                  <div class="btn-group">
+                    <a
+                      href="blog-admin/<%=blog.id%>"
+                      role="button"
+                      class="btn btn-sm btn-outline-secondary"
+                      >View</a
+                    >
+                    <a
+                      href="edit-blog/<%=blog.id%>"
+                      role="button"
+                      class="btn btn-sm btn-outline-secondary"
+                      >Edit</a
+                    >
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <%})%>
+        </div>
+      </div>
+    </main>
+  </body>
+</html>

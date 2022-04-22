@@ -1,0 +1,40 @@
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-family: "Open Sans", sans-serif;
+}
+
+hr.solid {
+  border-top: 3px solid #bbb;
+}
+
+.blogs {
+  margin: auto;
+  width: 50%;
+  padding: 10px;
+}
+
+.blog-title {
+  font-size: 60px;
+
+  font-family: "Varela Round", sans-serif;
+}
+
+.blog {
+  padding: 80px;
+}
+
+.login-btn {
+  position: absolute;
+  top: 0;
+  right: 0;
+  margin: 30px;
+}
+
+.no-blogs{
+  margin: auto;
+  width: 50%;
+  padding: 10px;
+}

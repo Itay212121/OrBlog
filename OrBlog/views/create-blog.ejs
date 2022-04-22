@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>Create a new blog</title>
+
+    <link
+      rel="canonical"
+      href="https://getbootstrap.com/docs/4.0/examples/sign-in/"
+    />
+
+    <!-- Bootstrap core CSS -->
+    <link
+      href="https://getbootstrap.com/docs/4.0//dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <!-- Custom styles for this template -->
+    <link href="create-blog.css" rel="stylesheet" />
+  </head>
+
+  <body class="text-center">
+    <form action="/create-blog" method="POST">
+      <div class="form-group">
+        <label for="exampleFormControlInput1">Blog Title</label>
+        <input
+          class="form-control"
+          id="exampleFormControlInput1"
+          placeholder="Why is math so important"
+          name="btitle"
+        />
+      </div>
+
+      <div class="form-check">
+        <input
+          name="bhidden"
+          class="form-check-input is-blog-hidden"
+          type="checkbox"
+          id="gridCheck1"
+        />
+        <label class="form-check-label" for="gridCheck1"> Hide the blog </label>
+      </div>
+
+      <br />
+      <div class="form-group">
+        <label for="exampleFormControlTextarea1">Blog description</label>
+        <textarea
+          class="form-control"
+          id="exampleFormControlTextarea1"
+          rows="5"
+          name="bdesc"
+        ></textarea>
+      </div>
+
+      <div class="blog-text form-group">
+        <label for="exampleFormControlTextarea1">Blog content</label>
+        <textarea
+          class="form-control"
+          id="exampleFormControlTextarea1"
+          rows="50"
+          name="bcontent"
+        ></textarea>
+      </div>
+
+      <button type="submit" class="btn btn-primary">Submit</button>
+    </form>
+  </body>
+</html>
