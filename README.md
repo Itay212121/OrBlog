@@ -1,5 +1,6 @@
-# OrBlog
-A blog with a backend
+# A Blog A website
+
+This is a cool blog website, which is very user friendly and everyone who wants to start their blog can use this repo by changing some credentials.
 
 in order to use this application, please do the following commands on your machine:
 
