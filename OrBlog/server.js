@@ -11,7 +11,7 @@ var session;
 
 const bodyParser = require("body-parser");
 const app = express();
-const db = require("quick.db");
+const Post = require("./models/post");
 const moment = require("moment");
 app.set("view engine", "ejs");
 
@@ -30,11 +30,9 @@ app.use(sessions({
 
 app.use(cookieParser());
 
-app.get("/", function (req, res) {
-  const visible_blogs =
-    db.fetch("blogs") == null
-      ? []
-      : db.fetch("blogs").filter((blog) => !blog.hidden);
+app.get("/",  async function (req, res) {
+  const all_posts = await Post.getAllPosts();
+  const visible_blogs = all_posts.filter((blog) => !blog.hidden);
   console.log(visible_blogs);
   res.render("index", {
     blogs: visible_blogs,
@@ -42,23 +40,23 @@ app.get("/", function (req, res) {
 });
 
 //moment().format('MMMM Do YYYY, h:mm:ss a'); // April 20th 2022, 4:25:12 pm
-app.get("/blog/:id", function (req, res) {
+app.get("/blog/:id", async function  (req, res) {
   var id = req.params.id;
-  var foundBlog = findBlog(id);
-  if (foundBlog != null && foundBlog.hidden == false) {
+  var foundBlog = await Post.getPostById(id);
+  if (foundBlog != null && foundBlog.hidden == 0) {
     res.render("blog", {
       title: foundBlog.title,
       dateUploaded: foundBlog.createdAt,
-      content: foundBlog.content,
+      content: foundBlog.body,
     });
   } else {
     res.render("error", {msg: "Couldn't find a none hidden blog with that id "});
   }
 });
 
-app.get("/blog-admin/:id", function (req, res) {
+app.get("/blog-admin/:id", async function (req, res) {
   var id = req.params.id;
-  var foundBlog = findBlog(id);
+  var foundBlog = await Post.getPostById(id);
   if (foundBlog != null) {
     res.render("blog", {
       title: foundBlog.title,
@@ -95,12 +93,9 @@ app.get("/login", (req, res) => {
 })
 app.post("/login", (req, res) => {
 
-  console.log(req.body);
-
   if(req.body.username == admin_username && req.body.password == admin_password){
       session=req.session;
       session.userid=req.body.username;
-      console.log(req.session)
       res.redirect("/admin-page");
   }
   else{
@@ -115,15 +110,16 @@ app.post("/create-blog", (req, res) => {
   let post_content = req.body.bcontent;
   let post_hidden = req.body.bhidden == "on";
   addBlog(post_title, post_desc, post_content, post_hidden);
+  console.log(req.body);
   res.render("admin-page");
 });
 
-app.get("/edit-blog", (req, res) => {
+app.get("/edit-blog", async (req, res) => {
   session=req.session;
 
   if(session.userid){
     res.render("edit-blog", {
-      blogs: db.fetch("blogs") == null ? [] : db.fetch("blogs"),
+      blogs: await Post.getAllPosts(),
     });
   
   }else{
@@ -132,9 +128,9 @@ app.get("/edit-blog", (req, res) => {
   
 });
 
-app.get("/edit-blog/:id", (req, res) => {
+app.get("/edit-blog/:id",async  (req, res) => {
   var id = req.params.id;
-  var foundBlog = findBlog(id);
+  var foundBlog = await Post.getPostById(id);
   if (foundBlog != null) {
     foundBlog.hidden_value = foundBlog.hidden == true ? "checked" : "";
     res.render("edit-blog-page", foundBlog);
@@ -143,26 +139,19 @@ app.get("/edit-blog/:id", (req, res) => {
   }
 });
 
-app.post("/edit-blog/:id", (req, res) => {
+app.post("/edit-blog/:id", async(req, res) => {
   var id = req.params.id;
-  var all_blogs = db.fetch("blogs");
-  var foundBlog = findBlog(id);
-  console.log("body", req.body);
+  var foundBlog = await Post.getPostById(id);
   if (foundBlog != null) {
-    foundBlog.title = req.body.btitle;
-    foundBlog.desc = req.body.bdesc;
-    foundBlog.content = req.body.bcontent;
-    foundBlog.hidden = req.body.bhidden == "on";
+    foundBlog.title = req.body.title;
+    foundBlog.desc = req.body.desc;
+    foundBlog.body = req.body.content;
+    foundBlog.hidden = req.body.hidden == "on";
 
-    db.set(
-      "blogs",
-      all_blogs.map((blog) => {
-        if (blog.id == id) {
-          return foundBlog;
-        }
-        return blog;
-      })
-    );
+    console.log(foundBlog);
+
+    Post.updatePost(id, foundBlog);
+
     res.render("admin-page");
   } else {
     res.render("error", {msg: "Couldn't find a blog with that id"});
@@ -172,18 +161,10 @@ app.listen(3000, function () {
   console.log("The server is ready");
 });
 
-function findBlog(id) {
-  const all_blogs = db.fetch("blogs");
-  if (all_blogs == null) all_blogs = [];
 
-  for (let i = 0; i < all_blogs.length; i++) {
-    if (all_blogs[i].id == id) return all_blogs[i];
-  }
-  return null;
-}
 
-function generateId() {
-  const all_blogs = db.fetch("blogs");
+async function generateId() {
+  const all_blogs = await Post.getAllPosts();
   if (all_blogs == null) all_blogs = [];
   let generatedId = Math.random().toString(36).replace("0.", "");
   if (all_blogs.find((blog) => blog.id == generatedId) == undefined) {
@@ -192,17 +173,15 @@ function generateId() {
   return generateId();
 }
 
-function addBlog(btitle, bdesc, bcontent, bhidden) {
-  const all_blogs = db.fetch("blogs");
-  if (all_blogs == null) all_blogs = [];
+async function addBlog(btitle, bdesc, bcontent, bhidden) {
 
-  all_blogs.push({
-    title: btitle,
-    desc: bdesc,
-    content: bcontent,
-    createdAt: moment().format("MMMM Do YYYY, h:mm:ss a"),
-    id: generateId(),
-    hidden: bhidden,
-  });
-  db.set("blogs", all_blogs);
+  let newBlog = new Post(
+    await generateId(),
+    btitle,
+    bdesc,
+    bcontent,
+    moment().format("MMMM Do YYYY, h:mm:ss a"),
+    bhidden,
+  );
+  newBlog.save();
 }
